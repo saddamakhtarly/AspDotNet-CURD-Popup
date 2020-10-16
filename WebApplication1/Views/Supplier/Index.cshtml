@@ -1,0 +1,168 @@
+﻿@model WebApplication1.Models.Supplier
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Supplier List</h2>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+
+<p>
+    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#supplierModel">New Supplier</a>
+</p>
+
+
+<div class="modal fade" id="supplierModel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Supplier Information</h2>
+            </div>
+            <div class="modal-body">
+                <form id="supplierForm">
+                    <label>Supplier Name</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    <label>Supplier Mobile</label>
+                    @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control" })
+                    <label>Supplier Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    <label>Supplier Address</label>
+                    @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <a href="#" id="btnSave" class="btn btn-primary mr-2">Save Supplier</a>
+                    <a href="#" id="btnCancel" class="btn btn-danger">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Supplier Information</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Are You Sure you want to delete this supplier</h3>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <a href="#" id="btnDelete" class="btn btn-primary mr-2">Delete Supplier</a>
+                    <a href="#" id="btnCancelConfrm" class="btn btn-danger">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<table class="table">
+    <tr>
+        <th>
+            Supplier Name
+        </th>
+        <th>
+            Mobile
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Address
+        </th>
+        <th>Action</th>
+    </tr>
+
+    @foreach (var item in ViewBag.suppliers)
+    {
+        <tr>
+            <td>
+                @item.Name
+            </td>
+            <td>
+                @item.Mobile
+            </td>
+            <td>
+                @item.Email
+            </td>
+            <td>
+                @item.Address
+            </td>
+            <td>
+                <a href="#" id="showModal" class="btn btn-danger" onclick="Confirm(@item.Id)">Delete</a>
+                |
+
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+<input type="hidden" id="supplierId"/>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            var supplierFormData = $("#supplierForm").serialize();
+            $.ajax({
+                type: "POST",
+                url: "/Supplier/SaveSupplier",
+                data: supplierFormData,
+                success: function () {
+                    window.location.href = "/Supplier/Index";
+                }
+            })
+        })
+        $("#btnCancel").click(function () {
+            window.location.href = "/Supplier/Index";
+        })
+        $("#btnCancelConfrm").click(function () {
+            window.location.href = "/Supplier/Index";
+        })
+
+        $("#btnDelete").click(function () {
+            var _id = $("#supplierId").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/Supplier/Delete",
+                data: { id: _id },
+                success: function (result) {
+                    if (result) {
+                        $("#deleteModel").modal('hide');
+                        $("#supplierId").val(null);
+                        window.location.href = "/Supplier/Index";
+                    } else {
+                        alert("Something went worng while processing your request");
+                    }
+                    
+                }
+            })
+        })
+
+
+    })
+    var Confirm = function (id) {
+        $("#supplierId").val(id);
+        $("#deleteModel").modal('show');
+    }
+
+</script>
+
+
+
+
+
+
+
